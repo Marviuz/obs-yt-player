@@ -1,3 +1,4 @@
+import ComfyJS from 'comfy.js';
 import { AnimatePresence, motion } from 'framer-motion';
 import { InferGetServerSidePropsType, NextPageContext } from 'next';
 import { YouTubeVideo } from 'play-dl';
@@ -13,6 +14,7 @@ export const getServerSideProps = async ({ query }: NextPageContext) => {
     props: {
       limit: parseInt(query.limit as string) || 5,
       rewardId: (query.rewardId as string) || null,
+      channel: (query.channel as string) || null,
     },
   };
 };
@@ -20,6 +22,7 @@ export const getServerSideProps = async ({ query }: NextPageContext) => {
 export default function OnRedeem({
   limit,
   rewardId,
+  channel,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const userInteraction = useComfyChat();
   const { mutate } = trpc.searchVid.useMutation();
@@ -34,11 +37,22 @@ export default function OnRedeem({
     ) {
       mutate(userInteraction.message, {
         onSuccess: (data) => {
-          setVideos((current) => [...current, data[0] as YouTubeVideo]);
+          if (data.length) {
+            setVideos((current) => [...current, data[0] as YouTubeVideo]);
+            ComfyJS.Say(
+              `@${userInteraction.user} queued ${data[0].title}`,
+              channel!
+            );
+          } else {
+            ComfyJS.Say(
+              `No videos found @${userInteraction.user}! Deadge`,
+              channel!
+            );
+          }
         },
       });
     }
-  }, [mutate, rewardId, userInteraction]);
+  }, [channel, mutate, rewardId, userInteraction]);
 
   useEffect(() => {
     if (!playing && videos.length) {
