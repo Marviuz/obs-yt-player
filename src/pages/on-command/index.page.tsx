@@ -1,4 +1,4 @@
-import ComfyJS from 'comfy.js';
+import ComfyJS, { OnMessageFlags } from 'comfy.js';
 import { AnimatePresence, motion } from 'framer-motion';
 import { InferGetServerSidePropsType, NextPageContext } from 'next';
 import { YouTubeVideo } from 'play-dl';
@@ -14,6 +14,7 @@ export const getServerSideProps = async ({ query }: NextPageContext) => {
     props: {
       limit: parseInt(query.limit as string) || 5,
       channel: (query.channel as string) || null,
+      allowed: query.allowed ? (query.allowed as string).split(',') : [],
     },
   };
 };
@@ -21,6 +22,7 @@ export const getServerSideProps = async ({ query }: NextPageContext) => {
 export default function OnCommand({
   limit,
   channel,
+  allowed,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const userInteraction = useComfyCommand();
   const { mutate } = trpc.searchVid.useMutation();
@@ -28,7 +30,14 @@ export default function OnCommand({
   const [playing, setPlaying] = useState<YouTubeVideo | null>(null);
 
   useEffect(() => {
-    if (userInteraction && userInteraction.command === 'ytwatch') {
+    if (
+      userInteraction &&
+      userInteraction.command === 'ytwatch' &&
+      (userInteraction.flags.broadcaster ||
+        allowed.filter(
+          (flag) => userInteraction.flags[flag as keyof OnMessageFlags]
+        ).length)
+    ) {
       mutate(userInteraction.message, {
         onSuccess: (data) => {
           if (data.length) {
@@ -46,7 +55,7 @@ export default function OnCommand({
         },
       });
     }
-  }, [userInteraction, mutate, channel]);
+  }, [allowed, channel, mutate, userInteraction]);
 
   useEffect(() => {
     if (!playing && videos.length) {

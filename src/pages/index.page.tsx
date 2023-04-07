@@ -278,24 +278,20 @@ export default function Home() {
                           Allowed users
                         </legend>
                         <div className="mt-4 space-y-4">
-                          {[
-                            'Broadcaster',
-                            'Mod',
-                            'Founder',
-                            'Subscriber',
-                            'VIP',
-                          ].map((item) => (
-                            <div className="flex items-start" key={item}>
-                              <div className="flex items-center h-5">
-                                <Checkbox
-                                  name={FormNames.Allowed}
-                                  id={item}
-                                  value={item}
-                                  label={item}
-                                ></Checkbox>
+                          {['Mod', 'Founder', 'Subscriber', 'VIP'].map(
+                            (item) => (
+                              <div className="flex items-start" key={item}>
+                                <div className="flex items-center h-5">
+                                  <Checkbox
+                                    name={FormNames.Allowed}
+                                    id={item.toLowerCase()}
+                                    value={item.toLowerCase()}
+                                    label={item}
+                                  ></Checkbox>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            )
+                          )}
                         </div>
                       </motion.fieldset>
                     )}
