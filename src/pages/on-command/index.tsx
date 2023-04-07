@@ -1,3 +1,4 @@
+import ComfyJS from 'comfy.js';
 import { AnimatePresence, motion } from 'framer-motion';
 import { InferGetServerSidePropsType, NextPageContext } from 'next';
 import { YouTubeVideo } from 'play-dl';
@@ -12,12 +13,14 @@ export const getServerSideProps = async ({ query }: NextPageContext) => {
   return {
     props: {
       limit: parseInt(query.limit as string) || 5,
+      channel: (query.channel as string) || null,
     },
   };
 };
 
 export default function OnCommand({
   limit,
+  channel,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const userInteraction = useComfyCommand();
   const { mutate } = trpc.searchVid.useMutation();
@@ -28,11 +31,22 @@ export default function OnCommand({
     if (userInteraction && userInteraction.command === 'ytwatch') {
       mutate(userInteraction.message, {
         onSuccess: (data) => {
-          setVideos((current) => [...current, data[0] as YouTubeVideo]);
+          if (data.length) {
+            setVideos((current) => [...current, data[0] as YouTubeVideo]);
+            ComfyJS.Say(
+              `@${userInteraction.user} queued ${data[0].title}`,
+              channel!
+            );
+          } else {
+            ComfyJS.Say(
+              `No videos found @${userInteraction.user}! Deadge`,
+              channel!
+            );
+          }
         },
       });
     }
-  }, [userInteraction, mutate]);
+  }, [userInteraction, mutate, channel]);
 
   useEffect(() => {
     if (!playing && videos.length) {
