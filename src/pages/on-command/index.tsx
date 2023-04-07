@@ -16,7 +16,7 @@ export const getServerSideProps = async ({ query }: NextPageContext) => {
   };
 };
 
-export default function OnRedeem({
+export default function OnCommand({
   limit,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const userInteraction = useComfyCommand();
