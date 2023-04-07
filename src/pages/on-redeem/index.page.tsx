@@ -80,6 +80,7 @@ export default function OnRedeem({
               width: '1280',
               height: '720',
               playerVars: {
+                autoplay: 1,
                 playsinline: 1,
                 controls: isDev ? 1 : 0,
                 end: limit,

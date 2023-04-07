@@ -2,6 +2,7 @@
   "extends": ["next/core-web-vitals", "plugin:import/recommended"],
   "plugins": ["import"],
   "rules": {
+    "import/no-named-as-default": "off",
     "import/order": [
       "error",
       {
