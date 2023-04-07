@@ -1,13 +1,58 @@
-import ComfyJS from 'comfy.js';
+import ComfyJS, { OnMessageFlags, OnMessageExtra } from 'comfy.js';
+import { useEffect, useState } from 'react';
 
-const useComfy = (channel: string) => {
-  ComfyJS.onCommand = (user, command, message, flags, extra) => {
-    if (flags.broadcaster && command === 'test') {
-      console.log('!test was typed in chat');
-    }
-  };
-
-  ComfyJS.Init(channel);
+type ComfyCommandType = {
+  user: string;
+  command: string;
+  message: string;
+  flags: OnMessageFlags;
+  extra: OnMessageExtra;
 };
 
-export default useComfy;
+type ComfyChatType = {
+  user: string;
+  message: string;
+  flags: OnMessageFlags;
+  self: boolean;
+  extra: OnMessageExtra;
+};
+
+export const useComfyCommand = () => {
+  const [userInteraction, setUserInteraction] = useState<ComfyCommandType>();
+
+  ComfyJS.onCommand = (user, command, message, flags, extra) => {
+    setUserInteraction({
+      user,
+      command,
+      message,
+      flags,
+      extra,
+    });
+  };
+
+  return userInteraction;
+};
+
+export const useComfyChat = () => {
+  const [userInteraction, setUserInteraction] = useState<ComfyChatType>();
+
+  useEffect(() => {
+    console.log('triggered');
+  }, []);
+
+  ComfyJS.onChat = (user, message, flags, self, extra) => {
+    setUserInteraction({
+      user,
+      message,
+      flags,
+      self,
+      extra,
+    });
+  };
+
+  return userInteraction;
+};
+
+const comfy = { useComfyCommand, useComfyChat };
+
+export default comfy;

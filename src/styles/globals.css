@@ -3,3 +3,7 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.player-bg {
+  background-color: #000;
+}
