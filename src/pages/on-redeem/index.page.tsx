@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import Youtube from 'react-youtube';
 
 import { isDev } from '@/constants';
-import { useComfyChat } from '@/hooks/comfy';
+import { useComfyChat, useComfyCommand } from '@/hooks/comfy';
 import { trpc } from '@/utils/trpc';
 
 export const getServerSideProps = async ({ query }: NextPageContext) => {
@@ -24,49 +24,46 @@ export default function OnRedeem({
   rewardId,
   channel,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const userInteraction = useComfyChat();
+  const [user, message, flags, self, extra] = useComfyChat();
+  const [_u, command, _m, commandFlags, _e, timestamp] = useComfyCommand();
   const { mutate } = trpc.searchVid.useMutation();
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
-  const [playing, setPlaying] = useState<YouTubeVideo | null>(null);
 
   useEffect(() => {
-    if (
-      userInteraction &&
-      userInteraction.flags.customReward &&
-      userInteraction.extra.customRewardId === rewardId
-    ) {
-      mutate(userInteraction.message, {
+    if (flags?.customReward && extra?.customRewardId === rewardId) {
+      mutate(message!, {
         onSuccess: (data) => {
           if (data.length) {
             setVideos((current) => [...current, data[0] as YouTubeVideo]);
-            ComfyJS.Say(
-              `@${userInteraction.user} queued ${data[0].title}`,
-              channel!
-            );
+            ComfyJS.Say(`@${user} queued ${data[0].title}`, channel!);
           } else {
-            ComfyJS.Say(
-              `No videos found @${userInteraction.user}! Deadge`,
-              channel!
-            );
+            ComfyJS.Say(`No videos found @${user}! Deadge`, channel!);
           }
         },
       });
     }
-  }, [channel, mutate, rewardId, userInteraction]);
+  }, [
+    channel,
+    extra?.customRewardId,
+    flags?.customReward,
+    message,
+    mutate,
+    rewardId,
+    user,
+  ]);
 
   useEffect(() => {
-    if (!playing && videos.length) {
-      setVideos(([toPlay, ...queue]) => {
-        setPlaying(toPlay);
-
-        return queue;
-      });
+    if (
+      command === 'ytstop' &&
+      (commandFlags?.broadcaster || commandFlags?.mod)
+    ) {
+      setVideos(([playing, ...queue]) => queue);
     }
-  }, [playing, videos.length]);
+  }, [command, commandFlags?.broadcaster, commandFlags?.mod, timestamp]);
 
   return (
     <AnimatePresence>
-      {playing && (
+      {videos[0] && (
         <motion.div
           className="player-bg"
           initial={{ x: '100%' }}
@@ -74,8 +71,8 @@ export default function OnRedeem({
           exit={{ x: '100%' }}
         >
           <Youtube
-            videoId={playing.id}
-            onEnd={() => setPlaying(null)}
+            videoId={videos[0].id}
+            onEnd={() => setVideos(([playing, ...queue]) => queue)}
             opts={{
               width: '1280',
               height: '720',

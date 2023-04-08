@@ -24,52 +24,36 @@ export default function OnCommand({
   channel,
   allowed,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const userInteraction = useComfyCommand();
+  const [user, command, message, flags, extra, timestamp] = useComfyCommand();
   const { mutate } = trpc.searchVid.useMutation();
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
-  const [playing, setPlaying] = useState<YouTubeVideo | null>(null);
 
   useEffect(() => {
     if (
-      userInteraction &&
-      userInteraction.command === 'ytwatch' &&
-      (userInteraction.flags.broadcaster ||
-        allowed.filter(
-          (flag) => userInteraction.flags[flag as keyof OnMessageFlags]
-        ).length)
+      command === 'ytwatch' &&
+      (flags?.broadcaster ||
+        allowed.filter((flag) => flags![flag as keyof OnMessageFlags]).length)
     ) {
-      mutate(userInteraction.message, {
+      mutate(message!, {
         onSuccess: (data) => {
           if (data.length) {
             setVideos((current) => [...current, data[0] as YouTubeVideo]);
-            ComfyJS.Say(
-              `@${userInteraction.user} queued ${data[0].title}`,
-              channel!
-            );
+            ComfyJS.Say(`@${user} queued ${data[0].title}`, channel!);
           } else {
-            ComfyJS.Say(
-              `No videos found @${userInteraction.user}! Deadge`,
-              channel!
-            );
+            ComfyJS.Say(`No videos found @${user}! Deadge`, channel!);
           }
         },
       });
     }
-  }, [allowed, channel, mutate, userInteraction]);
 
-  useEffect(() => {
-    if (!playing && videos.length) {
-      setVideos(([toPlay, ...queue]) => {
-        setPlaying(toPlay);
-
-        return queue;
-      });
+    if (command === 'ytstop' && (flags?.broadcaster || flags?.mod)) {
+      setVideos(([playing, ...queue]) => queue);
     }
-  }, [playing, videos.length]);
+  }, [allowed, channel, command, flags, message, mutate, user, timestamp]);
 
   return (
     <AnimatePresence>
-      {playing && (
+      {videos[0] && (
         <motion.div
           className="player-bg"
           initial={{ x: '100%' }}
@@ -77,8 +61,8 @@ export default function OnCommand({
           exit={{ x: '100%' }}
         >
           <Youtube
-            videoId={playing.id}
-            onEnd={() => setPlaying(null)}
+            videoId={videos[0].id}
+            onEnd={() => setVideos(([toPlay, ...queue]) => queue)}
             opts={{
               width: '1280',
               height: '720',

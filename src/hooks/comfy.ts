@@ -1,53 +1,43 @@
-import ComfyJS, { OnMessageFlags, OnMessageExtra } from 'comfy.js';
-import { useEffect, useState } from 'react';
-
-type ComfyCommandType = {
-  user: string;
-  command: string;
-  message: string;
-  flags: OnMessageFlags;
-  extra: OnMessageExtra;
-};
-
-type ComfyChatType = {
-  user: string;
-  message: string;
-  flags: OnMessageFlags;
-  self: boolean;
-  extra: OnMessageExtra;
-};
+import ComfyJS, {
+  OnMessageFlags,
+  OnMessageExtra,
+  OnCommandExtra,
+} from 'comfy.js';
+import { useState } from 'react';
 
 export const useComfyCommand = () => {
-  const [userInteraction, setUserInteraction] = useState<ComfyCommandType>();
+  const [userInteraction, setUserInteraction] = useState<
+    [string, string, string, OnMessageFlags, OnCommandExtra, number] | []
+  >([]);
 
   ComfyJS.onCommand = (user, command, message, flags, extra) => {
-    setUserInteraction({
+    setUserInteraction([
       user,
       command,
       message,
       flags,
       extra,
-    });
+      new Date().getTime(),
+    ]);
   };
 
   return userInteraction;
 };
 
 export const useComfyChat = () => {
-  const [userInteraction, setUserInteraction] = useState<ComfyChatType>();
-
-  useEffect(() => {
-    console.log('triggered');
-  }, []);
+  const [userInteraction, setUserInteraction] = useState<
+    [string, string, OnMessageFlags, boolean, OnMessageExtra, number] | []
+  >([]);
 
   ComfyJS.onChat = (user, message, flags, self, extra) => {
-    setUserInteraction({
+    setUserInteraction([
       user,
       message,
       flags,
       self,
       extra,
-    });
+      new Date().getTime(),
+    ]);
   };
 
   return userInteraction;
