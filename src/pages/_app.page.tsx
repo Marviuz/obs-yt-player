@@ -1,5 +1,6 @@
 import '@/styles/globals.css';
 import ComfyJS from 'comfy.js';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
@@ -17,7 +18,14 @@ const App: AppType = ({ Component, pageProps }) => {
     );
   }, [router.query.channel, router.query.replier]);
 
-  return <Component {...pageProps} />;
+  return (
+    <>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </Head>
+      <Component {...pageProps} />
+    </>
+  );
 };
 
 export default trpc.withTRPC(App);
