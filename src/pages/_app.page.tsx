@@ -12,8 +12,11 @@ const App: AppType = ({ Component, pageProps }) => {
   const router = useRouter();
 
   useEffect(() => {
-    const replier =
-      (router.query.replier as string) || process.env.NEXT_PUBLIC_REPLIER!;
+    const hasReplier = (router.query.replier as string).startsWith('oauth:');
+    const replier = hasReplier
+      ? (router.query.replier as string)
+      : process.env.NEXT_PUBLIC_REPLIER!;
+
     ComfyJS.Init(router.query.channel as string, replier);
   }, [router.query.channel, router.query.replier]);
 
