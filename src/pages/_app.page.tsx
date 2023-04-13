@@ -12,10 +12,9 @@ const App: AppType = ({ Component, pageProps }) => {
   const router = useRouter();
 
   useEffect(() => {
-    ComfyJS.Init(
-      router.query.channel as string,
-      (router.query.replier as string) || undefined
-    );
+    const replier =
+      (router.query.replier as string) || process.env.NEXT_PUBLIC_REPLIER!;
+    ComfyJS.Init(router.query.channel as string, replier);
   }, [router.query.channel, router.query.replier]);
 
   return (
