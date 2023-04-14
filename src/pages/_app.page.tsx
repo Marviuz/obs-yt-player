@@ -12,7 +12,7 @@ const App: AppType = ({ Component, pageProps }) => {
   const router = useRouter();
 
   useEffect(() => {
-    const hasReplier = (router.query.replier as string).startsWith('oauth:');
+    const hasReplier = (router.query.replier as string)?.startsWith('oauth:');
     const replier = hasReplier
       ? (router.query.replier as string)
       : process.env.NEXT_PUBLIC_REPLIER!;
