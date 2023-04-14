@@ -191,6 +191,21 @@ export default function Home() {
                           . Once the authorization process is complete, please
                           copy and paste the code provided below.
                         </p>
+                        <p className="mb-2 text-sm text-white">
+                          If you choose not to assign a specific replier, the
+                          app will automatically utilize the default replier. If
+                          you encounter an issue where the default replier fails
+                          to respond, it is possible that a setting such as{' '}
+                          <em>
+                            &quot;only verified phone numbers can chat&quot; is
+                            enabled.{' '}
+                          </em>
+                          In such an event, kindly enter the command to your
+                          chat{' '}
+                          <span className="text-green-500">
+                            /mod secretary_ganyu
+                          </span>
+                        </p>
                         <div className="text-base font-medium text-white contents">
                           Example code
                         </div>
