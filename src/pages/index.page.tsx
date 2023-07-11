@@ -3,7 +3,6 @@ import { Form, Formik, FormikHelpers, FormikValues } from 'formik';
 import { AnimatePresence, motion } from 'framer-motion';
 import Head from 'next/head';
 import Image from 'next/image';
-import Script from 'next/script';
 import { useCallback, useState } from 'react';
 
 import CopyIcon from '@/Icons/Copy';
@@ -365,11 +364,6 @@ export default function Home() {
         </div>
       </main>
       <Footer />
-      <Script
-        async
-        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT}`}
-        crossOrigin="anonymous"
-      />
     </>
   );
 }
