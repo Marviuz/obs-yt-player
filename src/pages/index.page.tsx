@@ -10,6 +10,7 @@ import LinkIcon from '@/Icons/Link';
 import Logo from '@/assets/Logo.png';
 import Button from '@/components/Base/Button';
 import BaseField from '@/components/Base/Field';
+import Footer from '@/components/Feature/Footer';
 import Checkbox from '@/components/Feature/FormControls/Checkbox';
 import Field from '@/components/Feature/FormControls/Field';
 import Radio from '@/components/Feature/FormControls/Radio';
@@ -209,7 +210,7 @@ export default function Home() {
                         <div className="text-base font-medium text-white contents">
                           Example code
                         </div>
-                        <code className="block px-2 py-1 mb-2 text-white bg-gray-900 rounded-md">
+                        <code className="block px-2 py-1 mb-2 text-white truncate bg-gray-900 rounded-md">
                           oauth:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
                         </code>
                         <Field
@@ -362,6 +363,7 @@ export default function Home() {
           </div>
         </div>
       </main>
+      <Footer />
     </>
   );
 }
