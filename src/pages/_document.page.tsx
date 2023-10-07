@@ -15,11 +15,6 @@ export default function Document() {
         <meta name="language" content="English" />
         <meta name="revisit-after" content="3 days" />
         <meta name="author" content="Marviuz" />
-        <script
-          async
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_CLIENT}`}
-          crossOrigin="anonymous"
-        />
       </Head>
       <body>
         <Main />
